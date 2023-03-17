@@ -67,6 +67,31 @@ describe("Voucher Service test suite", () => {
     expect(result).toMatchObject(expectedReturn);
   });
 
+  it("should not apply a used voucher", async () => {
+    const usedVoucher: Voucher = {
+      id: 1,
+      code: "valid_amount",
+      discount: 10,
+      used: true
+    };
+    
+    const validAmount = 100;
+    
+    const expectedReturn = {
+      amount: validAmount,
+      discount: usedVoucher.discount,
+      finalAmount: validAmount,
+      applied: false
+    };
+
+    jest.spyOn(voucherRepository, "getVoucherByCode").mockResolvedValueOnce(usedVoucher);
+    
+    const result = await voucherService.applyVoucher(usedVoucher.code, validAmount);
+
+    console.log(result);
+    expect(result).toMatchObject(expectedReturn);
+  });
+
   it("should successfullly apply a voucher", async () => {
     const validAmountVoucher: Voucher = {
       id: 1,
@@ -76,8 +101,7 @@ describe("Voucher Service test suite", () => {
     };
     
     const validAmount = 200;
-    
-    
+        
     const usedValidVoucher: Voucher = {
       id: validAmountVoucher.id,
       code: validAmountVoucher.code,
@@ -97,7 +121,6 @@ describe("Voucher Service test suite", () => {
     
     const result = await voucherService.applyVoucher(validAmountVoucher.code, validAmount);
 
-    console.log(result);
     expect(result).toMatchObject(expectedReturn);
   });
 
